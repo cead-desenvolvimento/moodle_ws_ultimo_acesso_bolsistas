@@ -1,0 +1,12 @@
+DROP TABLE fi_frequencia_moodle;
+
+CREATE TABLE fi_frequencia_moodle (
+	id_frequencia_moodle INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	id_data_frequencia int NOT NULL,
+	id_pessoa INT NOT NULL,
+	id_moodle VARCHAR(11) NOT NULL,
+	ultimo_acesso TIMESTAMP NULL DEFAULT NULL,
+	data_consulta TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	FOREIGN KEY (id_data_frequencia) REFERENCES fi_data_frequencia(id_data_frequencia),
+	FOREIGN KEY (id_pessoa) REFERENCES cm_pessoa(id_pessoa)
+);
