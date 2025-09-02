@@ -74,13 +74,12 @@
 
 		$result = pg_query($GLOBALS['link'], $query);
 
-		if (pg_num_rows($result) > 0) {
-			while ($row = pg_fetch_row($result)) {
-				$rows[] = array($row[0], $row[1]);
-			}
-			return $rows;
+		if (pg_num_rows($result) == 0) return null;
+		
+		while ($row = pg_fetch_row($result)) {
+			$rows[] = array($row[0], $row[1]);
 		}
-		return null;
+		return $rows;
 	}
 
 	// So e' chamada se passar argumento mostraedital na chamada do arquivo
@@ -103,7 +102,6 @@
 
 	function get_bolsistas_autorizados_relatorio($id_data_frequencia) {
 		if (empty($id_data_frequencia)) return null;
-		$rows = array();
 
 		$query = "SELECT id, curso_nome, cpf, pessoa_nome, funcao ";
 		$query .= "FROM (";
@@ -131,28 +129,28 @@
 
 		$result = pg_query($GLOBALS['link'], $query);
 
-		if (pg_num_rows($result) > 0) {
-			while ($row = pg_fetch_row($result)) {
-				$info_edital = array();
+		if (pg_num_rows($result) == 0) return null;
 
-				if ($_SERVER['argc'] > 1 && $_SERVER['argv'][1] == 'mostraedital')
-					$info_edital = get_edital_bolsista($row[0]);
+		$rows = array();
+		while ($row = pg_fetch_row($result)) {
+			$info_edital = array();
 
-				if (!empty($info_edital))
-					/*
-						* id, nome do curso, cpf, nome da pessoa, funcao da pessoa,
-						* numero/ano do edital, descricao do edital
-						*
-						* Preciso do id aqui para fazer a busca em get_fi_frequencia_moodle_ultimo_acesso
-						* Se eu procurar por CPF pode ser que volte vazio porque nem sempre o login e' CPF
-					*/
-					$rows[] = array($row[0], $row[1], $row[2], $row[3], $row[4], $info_edital[0].'/'.$info_edital[1], $info_edital[2]);
-				else
-					$rows[] = array($row[0], $row[1], $row[2], $row[3], $row[4], NULL, NULL);
-			}
-			return $rows;
+			if ($_SERVER['argc'] > 1 && $_SERVER['argv'][1] == 'mostraedital')
+				$info_edital = get_edital_bolsista($row[0]);
+
+			if (!empty($info_edital))
+				/*
+					* id, nome do curso, cpf, nome da pessoa, funcao da pessoa,
+					* numero/ano do edital, descricao do edital
+					*
+					* Preciso do id aqui para fazer a busca em get_fi_frequencia_moodle_ultimo_acesso
+					* Se eu procurar por CPF pode ser que volte vazio porque nem sempre o login e' CPF
+				*/
+				$rows[] = array($row[0], $row[1], $row[2], $row[3], $row[4], $info_edital[0].'/'.$info_edital[1], $info_edital[2]);
+			else
+				$rows[] = array($row[0], $row[1], $row[2], $row[3], $row[4], NULL, NULL);
 		}
-		return null;
+		return $rows;
 	}
 
 	function get_fi_frequencia_moodle_ultimo_acesso($cm_pessoa_id, $fi_datafrequencia_id) {
@@ -168,15 +166,14 @@
 
 		$result = pg_query($GLOBALS['link'], $query);
 
-		if (pg_num_rows($result) > 0) {
-			$rows = array();
-			while ($row = pg_fetch_row($result)) {
-				$ultimo_acesso = is_null($row[1]) ? "" : $row[1];
-				$rows[] = array($row[0], $ultimo_acesso);
-			}
-			return $rows;
+		if (pg_num_rows($result) == 0) return null;
+
+		$rows = array();
+		while ($row = pg_fetch_row($result)) {
+			$ultimo_acesso = is_null($row[1]) ? "" : $row[1];
+			$rows[] = array($row[0], $ultimo_acesso);
 		}
-		return null;
+		return $rows;	
 	}
 
 	function generate_html_report($bolsistas) {
