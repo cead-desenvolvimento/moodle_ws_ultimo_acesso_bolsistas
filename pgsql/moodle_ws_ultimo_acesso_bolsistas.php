@@ -29,10 +29,12 @@
 
 	$data_fim_frequencia = get_data_fim_frequencia(get_ultimo_fi_datafrequencia_id());
 
-	if ($data_fim_frequencia == date('Y-m-d',strtotime("-1 days")))
-		echo date_format(date_create($data_fim_frequencia), 'm/Y');
-	else
-		echo 0;
+	$data_fim_frequencia = $data_fim_frequencia ? (new DateTime($data_fim_frequencia))->format('Y-m-d') : null;
+	$ontem = (new DateTime('yesterday'))->format('Y-m-d');
 
+	if ($data_fim_frequencia !== null && $data_fim_frequencia === $ontem)
+		echo (new DateTime($data_fim_frequencia))->format('m/Y') . PHP_EOL;
+	else
+		echo "0" . PHP_EOL;
 	pg_close($link);
 ?>
