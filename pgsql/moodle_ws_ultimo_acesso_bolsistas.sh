@@ -6,4 +6,4 @@ if ($eh_hoje == 0) then
     exit 1
 endif
 
-php /root/moodle_ws_ultimo_acesso_bolsistas/index.php
+php /root/moodle_ws_ultimo_acesso_bolsistas/index.php escondec10

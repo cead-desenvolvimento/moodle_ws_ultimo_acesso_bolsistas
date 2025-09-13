@@ -4,9 +4,14 @@
 		Tem tambem documentacao do Moodle online
 	*/
 	/*
-		Argumento: mostraedital
+		Argumento: mostraedital (obsoleto)
 		Se passar index.php mostraedital imprime a qual
 		edital o bolsista pertence
+	*/
+	/*
+		Argumento: escondec10
+		Se passar index.php escondec10 remove da lista os
+		bolsistas do Ciencia e' 10, que estao em outro Moodle
 	*/
 
 	function is_moodle_online() {
@@ -63,14 +68,19 @@
 	}
 
 	// Retorna os bolsistas autorizados num array(cpf, cm_pessoa_id)
+	// Parametro 'escondec10' remove da lista os bolsistas do Ciencia e' 10, que estao em outro Moodle 
 	function get_bolsistas_autorizados($id_data_frequencia) {
 		if (empty($id_data_frequencia)) return null;
 		$rows = array();
 
 		$query = "SELECT cm_pessoa.cpf, fi_frequencia.cm_pessoa_id FROM sistemascead.fi_frequencia ";
 		$query .= "INNER JOIN sistemascead.cm_pessoa ON fi_frequencia.cm_pessoa_id = cm_pessoa.id ";
-		$query .= "WHERE fi_frequencia.fi_datafrequencia_id = ";
-		$query .= intval($id_data_frequencia);
+		$query .= "WHERE fi_frequencia.fi_datafrequencia_id = " . intval($id_data_frequencia);
+
+		if (isset($_SERVER['argc']) && $_SERVER['argc'] > 1 && $_SERVER['argv'][1] === 'escondec10') {
+			$query .= " AND fi_frequencia.cm_pessoa_coordenador_id != (";
+			$query .= "SELECT cm_pessoa_coordenador_id FROM sistemascead.ac_curso WHERE id = 49)";
+		}
 
 		$result = pg_query($GLOBALS['link'], $query);
 
@@ -83,6 +93,7 @@
 	}
 
 	// So e' chamada se passar argumento mostraedital na chamada do arquivo
+	// Inutilizado: o relatorio nao e' mais gerado por aqui
 	function get_edital_bolsista($id_bolsista) {
 		if (empty($id_bolsista)) return null;
 
@@ -100,6 +111,7 @@
 		else return null;
 	}
 
+	// Inutilizado: o relatorio nao e' mais gerado por aqui
 	function get_bolsistas_autorizados_relatorio($id_data_frequencia) {
 		if (empty($id_data_frequencia)) return null;
 
@@ -135,7 +147,7 @@
 		while ($row = pg_fetch_row($result)) {
 			$info_edital = array();
 
-			if ($_SERVER['argc'] > 1 && $_SERVER['argv'][1] == 'mostraedital')
+			if ($_SERVER['argc'] > 1 && $_SERVER['argv'][1] === 'mostraedital')
 				$info_edital = get_edital_bolsista($row[0]);
 
 			if (!empty($info_edital))
@@ -176,6 +188,7 @@
 		return $rows;	
 	}
 
+	// Inutilizado: o relatorio nao e' mais gerado por aqui
 	function generate_html_report($bolsistas) {
 		$html = "<!DOCTYPE html><head><meta charset=\"UTF-8\"><style>@media print {.pagebreak {page-break-before: always;}}</style></head><body>";
 
